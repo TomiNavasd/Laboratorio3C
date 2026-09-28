@@ -16,10 +16,16 @@ class AppTecaViewModel : ViewModel() {
     private val _modoSoloFavoritas = MutableStateFlow(false)
     val modoSoloFavoritas: StateFlow<Boolean> = _modoSoloFavoritas
 
+    private val _appSeleccionada = MutableStateFlow<App?>(null)
+    val appSeleccionada: StateFlow<App?> = _appSeleccionada
+
     init {
         Log.d("VIDA", "ViewModel → creado (${hashCode()})")
         aplicarFiltros()
     }
+
+    fun seleccionar(app: App) { _appSeleccionada.value = app }
+    fun volverALista() { _appSeleccionada.value = null }
 
     fun buscar(texto: String) {
         query = texto.trim()
@@ -49,6 +55,11 @@ class AppTecaViewModel : ViewModel() {
 
         _listaVisible.value = lista
         _modoSoloFavoritas.value = soloFavoritas
+
+        // El detalle también respira del estado vivo
+        _appSeleccionada.value = _appSeleccionada.value?.let { sel ->
+            Catalogo.apps.find { it.id == sel.id }
+        }
     }
 
     override fun onCleared() {
